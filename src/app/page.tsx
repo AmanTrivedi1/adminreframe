@@ -1,53 +1,92 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import Link from "next/link";
+import { WebsiteCard } from "@/components/websiteCard";
+import { Navbar } from "@/components/navbar";
 
+const cardData = [
+  {
+    title: "Vacation Saga",
+    steps: [
+      "You can edit things",
+      "You need to had id password",
+      "You need to permit by admin",
+      "Only superadmin can give you access",
+    ],
+    description: "This route belong to Vacation saga",
+    link: "/dashboard/user",
+  },
+  {
+    title: "Housing Saga",
+    steps: [
+      "You can edit things",
+      "You need to had id password",
+      "You need to permit by admin",
+      "Only superadmin can give you access",
+    ],
+    description: "This route belong to Housing saga",
+    link: "/dashboard/user",
+  },
+  {
+    title: "Tect Tune",
+    steps: [
+      "You can edit things",
+      "You need to had id password",
+      "You need to permit by admin",
+      "Only superadmin can give you access",
+    ],
+    description: "This route belong to Tect tune",
+
+    link: "/dashboard/user",
+  },
+  {
+    title: "Coworking space",
+    steps: [
+      "You can edit things",
+      "You need to had id password",
+      "You need to permit by admin",
+      "Only superadmin can give you access",
+    ],
+    description: "This route belong to Coworking space",
+
+    link: "/dashboard/user",
+  },
+  {
+    title: "Future website",
+    steps: [
+      "You can edit things",
+      "You need to had id password",
+      "You need to permit by admin",
+      "Only superadmin can give you access",
+    ],
+    description: "Will be update in furure",
+
+    link: "/dashboard/user",
+  },
+];
 
 export default function HomePage() {
   return (
-    <div className="flex flex-wrap justify-center gap-6 mt-10">
-      <Link href="/dashboard/user">
-        <Card className="w-64 cursor-pointer hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle>Section 1</CardTitle>
-            <CardDescription>Manage Section 1</CardDescription>
-          </CardHeader>
-          <CardContent></CardContent>
-        </Card>
-      </Link>
-      <Link href="/dashboard/">
-        <Card className="w-64 cursor-pointer hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle>Section 2</CardTitle>
-            <CardDescription>Manage Section 2</CardDescription>
-          </CardHeader>
-          <CardContent></CardContent>
-        </Card>
-      </Link>
-      <Link href="/dashboard/section3">
-        <Card className="w-64 cursor-pointer hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle>Section 3</CardTitle>
-            <CardDescription>Manage Section 3</CardDescription>
-          </CardHeader>
-          <CardContent></CardContent>
-        </Card>
-      </Link>
-      <Link href="/dashboard/section4">
-        <Card className="w-64 cursor-pointer hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle>Section 4</CardTitle>
-            <CardDescription>Manage Section 4</CardDescription>
-          </CardHeader>
-          <CardContent></CardContent>
-        </Card>
-      </Link>
-    </div>
+    <>
+      <div>
+        <div>
+          <Navbar />
+        </div>
+        <div>
+          <div className=" max-w-7xl cursor-pointer m-auto p-2 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {cardData.map((card, index) => (
+                <WebsiteCard
+                  key={index}
+                  title={card.title}
+                  steps={card.steps}
+                  description={card.description}
+                  link={card.link}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

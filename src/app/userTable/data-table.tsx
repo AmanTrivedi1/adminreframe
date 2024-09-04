@@ -32,6 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -86,10 +87,20 @@ export function DataTable<TData, TValue>({
           </div>
           <div className="">
             <Button className="w-full sm:flex items-center gap-x-1 hidden">
-              Add User <Plus className="text-sm" />
+              <Link
+                className="flex items-center justify-center gap-x-2"
+                href={"/dashboard/createnewuser"}
+              >
+                Add user <Plus />
+              </Link>
             </Button>
             <Button className="sm:hidden">
-              <Plus className="text-xl" />
+              <Link
+                className="flex items-center justify-center gap-x-2"
+                href={"/dashboard/createnewuser"}
+              >
+                 <Plus />
+              </Link>
             </Button>
           </div>
         </div>

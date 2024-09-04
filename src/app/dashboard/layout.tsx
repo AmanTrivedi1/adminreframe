@@ -10,7 +10,7 @@ export default function DashboardLayout({
   return (
     <div className="flex  ">
       <Sidebar />
-      <main className=" p-2 w-full">
+      <main className=" lg:ml-64 p-2 w-full">
         <div>{children}</div>
       </main>
     </div>

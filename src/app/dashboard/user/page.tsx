@@ -1,4 +1,4 @@
-"use client";
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { MdDeleteSweep } from "react-icons/md";
@@ -15,7 +15,7 @@ import { LogoutButton } from "@/components/logoutAlertBox";
 
 const UserPage = () => {
   return (
-    <div className="lg:ml-64">
+    <div className="">
       <div className="flex sm:flex-row flex-col-reverse justify-between">
         <div className="flex justify-between w-full gap-x-1  ">
           <div className="flex w-full items-center space-x-2">
