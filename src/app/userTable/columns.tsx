@@ -1,8 +1,6 @@
 "use client";
-
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
-import { MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -14,57 +12,56 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { UserInterface } from "@/util/type";
 
-export type Payment = {
-  serialNo: string;
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
+
+const renderCell = (value: any) => {
+  return value ? value : "NA";
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<UserInterface>[] = [
   {
     accessorKey: "serialNo",
     header: "Serials",
   },
   {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ getValue }) => renderCell(getValue()),
+  },
+  {
+    accessorKey: "phone",
+    header: "Contact",
+    cell: ({ getValue }) => renderCell(getValue()),
+  },
+  {
     accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Email
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ getValue }) => renderCell(getValue()),
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
+    accessorKey: "nationality",
+    header: "Nationality",
+    cell: ({ getValue }) => renderCell(getValue()),
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ getValue }) => renderCell(getValue()),
   },
-
   {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const user = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -76,7 +73,7 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
+              onClick={() => navigator.clipboard.writeText(user._id)}
             >
               Copy userId
             </DropdownMenuItem>
@@ -99,3 +96,8 @@ export const columns: ColumnDef<Payment>[] = [
     },
   },
 ];
+
+
+// TODO Above code is working fine 
+
+

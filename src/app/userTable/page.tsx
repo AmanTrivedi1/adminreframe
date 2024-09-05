@@ -1,122 +1,104 @@
-import { Payment, columns } from "./columns";
+// // "use client";
+
+// // import { useEffect, useState } from "react";
+// // import { columns } from "./columns";
+// // import { DataTable } from "./data-table";
+// // import { UserInterface } from "@/util/types";
+// // import axios from "axios";
+
+// // export default function TablePage() {
+// //   const [data, setData] = useState<UserInterface[]>([]);
+// //   const [page, setPage] = useState(1);
+// //   const [pageSize] = useState(20);
+// //   const [search, setSearch] = useState("");
+// //   const [queryType, setQueryType] = useState("email");
+
+// //   useEffect(() => {
+// //     async function getData() {
+// //       try {
+// //         const response = await axios.get(`/api/user/getallusers`, {
+// //           params: {
+// //             currentPage: page,
+// //             queryType: queryType,
+// //             userInput: search,
+// //           },
+// //         });
+// //         setData(response.data.allUsers);
+// //         console.log(response.data.allUsers);
+// //       } catch (error) {
+// //         console.log(error);
+// //       }
+// //     }
+
+// //     getData();
+// //   }, [page, search, queryType]);
+
+// //   return (
+// //     <div className="p-4">
+// //       <DataTable
+// //         data={data}
+// //         columns={columns}
+// //         setPage={setPage}
+// //         setSearch={setSearch}
+// //         setQueryType={setQueryType}
+// //         search={search}
+// //       />
+// //     </div>
+// //   );
+// // }
+
+// // TablePage.tsx
+
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { columns } from "./columns";
 import { DataTable } from "./data-table";
 
-async function getData(): Promise<Payment[]> {
-  return [
-    {
-      serialNo: "1",
-      id: "728ed52f",
-      amount: 200,
-      status: "processing",
-      email: "fsefm@example.com",
-    },
-    {
-      serialNo: "2",
-      id: "728ed52",
-      amount: 400,
-      status: "success",
-      email: "fsefm@example.com",
-    },
-    {
-      serialNo: "3",
-      id: "728ed2",
-      amount: 600,
-      status: "processing",
-      email: "sdfm@example.com",
-    },
-    {
-      serialNo: "4",
-      id: "72ed52f",
-      amount: 700,
-      status: "success",
-      email: "fwefm@example.com",
-    },
-    {
-      serialNo: "5",
-      id: "728e52f",
-      amount: 900,
-      status: "pending",
-      email: "wfsm@example.com",
-    },
-    {
-      serialNo: "6",
-      id: "28ed52f",
-      amount: 1000,
-      status: "pending",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "7",
-      id: "28ed52f",
-      amount: 1000,
-      status: "pending",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "8",
-      id: "28ed52f",
-      amount: 1000,
-      status: "failed",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "9",
-      id: "28ed52f",
-      amount: 1000,
-      status: "pending",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "10",
-      id: "28ed52f",
-      amount: 1000,
-      status: "pending",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "11",
-      id: "28ed52f",
-      amount: 1000,
-      status: "pending",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "12",
-      id: "28ed52f",
-      amount: 1000,
-      status: "pending",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "13",
-      id: "28ed52f",
-      amount: 1000,
-      status: "pending",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "14",
-      id: "28ed52f",
-      amount: 1000,
-      status: "pending",
-      email: "mwer@example.com",
-    },
-    {
-      serialNo: "15",
-      id: "28ed52f",
-      amount: 1000,
-      status: "failed",
-      email: "mwer@example.com",
-    },
-  ];
-}
+import debounce from "lodash.debounce";
+import axios from "axios";
+import { UserInterface } from "@/util/type";
 
-export default async function TablePage() {
-  const data = await getData();
+export default function TablePage() {
+  const [data, setData] = useState<UserInterface[]>([]);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
+  const [search, setSearch] = useState("");
+  const [queryType, setQueryType] = useState("email"); // Ensure queryType is set here
+
+  const fetchData = useCallback(
+    debounce(async (search: string, queryType: string, page: number) => {
+      try {
+        const response = await axios.get(`/api/user/getallusers`, {
+          params: {
+            currentPage: page,
+            queryType: queryType,
+            userInput: search,
+          },
+        });
+        setData(response.data.allUsers);
+        console.log(response.data.allUsers);
+      } catch (error) {
+        console.log(error);
+      }
+    }, 1000),
+    []
+  );
+  useEffect(() => {
+    fetchData(search, queryType, page);
+  }, [search, page, fetchData]);
 
   return (
-    <div className="  ">
-      <DataTable columns={columns} data={data} />
+    <div className="">
+      <DataTable
+        data={data}
+        columns={columns}
+        setPage={setPage}
+        setSearch={setSearch}
+        setQueryType={setQueryType}
+        search={search}
+        queryType={queryType}
+      />
     </div>
   );
 }

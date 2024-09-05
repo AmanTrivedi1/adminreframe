@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 import {
   Select,
@@ -20,8 +21,7 @@ const NewUser = () => {
         <Button variant="ghost" className="border">
           <Link
             className="flex items-center justify-between gap-x-2"
-            href={"/dashboard/user"}
-          >
+            href={"/dashboard/user"}>
             <ArrowLeftFromLine />
             Dashboard
           </Link>
@@ -69,27 +69,52 @@ const NewUser = () => {
                   </Select>
                 </div>
               </div>
-
-              <div>
-                <Label htmlFor="Nationality">Nationality</Label>
-                <Input placeholder="nationality" id="name" />
+              <div className="flex  w-full gap-x-2 justify-between">
+                <div className="w-full">
+                  <Label htmlFor="Nationality">Nationality</Label>
+                  <Input placeholder="nationality" id="name" />
+                </div>
+                <div className="w-full">
+                  <Label htmlFor="Language">Language</Label>
+                  <Input placeholder="language" id="name" />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="Language">Language</Label>
-                <Input placeholder="language" id="name" />
-              </div>
-
               <div>
                 <Label htmlFor="Address">Address</Label>
                 <Input placeholder="address" id="name" />
               </div>
-              <div>
-                <Label htmlFor="contact">Contact detals</Label>
-                <Input placeholder="contact" id="name" />
+              <div className="flex  w-full gap-x-2 justify-between">
+                <div className="w-full">
+                  <Label htmlFor="Bank">Bank detals</Label>
+                  <Input placeholder="bank" id="name" />
+                </div>
+
+                <div className="w-full">
+                  <Label htmlFor="gender">Select Role</Label>
+                  <Select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="light">Owner</SelectItem>
+                      <SelectItem value="dark">Traveller</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="Bank">Bank detals</Label>
-                <Input placeholder="bank" id="name" />
+              <div className="items-top mt-2 flex space-x-2">
+                <Checkbox id="terms1" />
+                <div className="grid gap-1.5 leading-none">
+                  <label
+                    htmlFor="terms1"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Send my registration details to email
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    Please check you spam folder to get your details
+                  </p>
+                </div>
               </div>
 
               <div>
