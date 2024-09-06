@@ -3,7 +3,6 @@ import { Property } from "@/models/listing";
 import { connectDb } from "@/util/db";
 
 connectDb();
-
 export async function GET(request: Request): Promise<NextResponse> {
   try {
     const url = new URL(request.url);

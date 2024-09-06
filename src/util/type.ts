@@ -12,7 +12,7 @@ export interface UserInterface {
     name: string;
     nationality: string;
     password: string;
-    phone: string;
+    phone: number;
     profilePic: string;
     role: string;
     spokenLanguage: string;

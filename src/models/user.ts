@@ -30,7 +30,7 @@ const userSchema = new Schema<IUser>(
       default: "English",
     },
     bankDetails: {
-      type: Object,
+      type: String,
       default: "",
     },
     phone: {
