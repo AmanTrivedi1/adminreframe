@@ -14,16 +14,11 @@ import {
 import Link from "next/link";
 import { UserInterface } from "@/util/type";
 
-
 const renderCell = (value: any) => {
   return value ? value : "NA";
 };
 
 export const columns: ColumnDef<UserInterface>[] = [
-  {
-    accessorKey: "serialNo",
-    header: "Serials",
-  },
   {
     accessorKey: "name",
     header: "Name",
@@ -97,7 +92,4 @@ export const columns: ColumnDef<UserInterface>[] = [
   },
 ];
 
-
-// TODO Above code is working fine 
-
-
+// TODO Above code is working fine

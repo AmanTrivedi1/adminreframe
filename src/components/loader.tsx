@@ -4,7 +4,7 @@ import React from "react";
 const Loader = () => {
   return (
     <div>
-      <LuLoader2 className="animate-spin" />
+      <LuLoader2 className="animate-spin text-xl" />
     </div>
   );
 };

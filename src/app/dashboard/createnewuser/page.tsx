@@ -11,9 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeftFromLine } from "lucide-react";
+import { ArrowLeftFromLine, Plus } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -23,39 +23,59 @@ import Loader from "@/components/loader";
 import { useBunnyUpload } from "@/hooks/useBunnyUpload";
 
 const NewUser = () => {
-  const { uploadFiles, loading } = useBunnyUpload();
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const { toast } = useToast();
+  const [profilePic, setProfilepic] = useState("");
+
+  const { uploadFiles } = useBunnyUpload();
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setPreviewImage(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
 
-    const filesArray = Array.from(files);
-    const previews: string[] = [];
-
-    filesArray.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        previews.push(event.target?.result as string);
-        if (previews.length === filesArray.length) {
-          setPreviewImages(previews);
-        }
-      };
-      reader.readAsDataURL(file);
+    toast({
+      title: "Processing..",
+      description: "Your image is being uploaded.",
     });
 
-    const { imageUrls, error } = await uploadFiles(filesArray);
-
-    if (error) {
-      alert(error);
-    } else {
-      setImageUrls(imageUrls);
-      setPreviewImages([]); // Hide preview images after upload
+    try {
+      const { imageUrls, error } = await uploadFiles([file]);
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Upload failed",
+          description:
+            "There was an error uploading your image. Please try again.",
+        });
+      } else {
+        setProfilepic(imageUrls[0]);
+        toast({
+          title: "Upload successful",
+          description: "Your image has been uploaded successfully.",
+        });
+      }
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "An unexpected error occurred",
+        description: "Please try again.",
+      });
     }
   };
 
-  const { toast } = useToast();
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -73,18 +93,24 @@ const NewUser = () => {
       bankDetails: "",
       phone: "",
       address: "",
-      role: "Owner",
+      role: "Traveller",
     },
   });
 
-  // TODO Below is the form submission code
-  const [loadingg, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: UserSchema) => {
+    console.log(data, "I am submitting");
     setLoading(true);
+    const userData = {
+      ...data,
+      profilePic,
+    };
+
+    console.log(userData);
     try {
-      const response = await axios.post("/api/user/createnewuser", data);
-      console.log("User created:", response.data);
+      const response = await axios.post("/api/user/createnewuser", userData);
+      console.log("Inside Api call", response.data);
       toast({
         title: "User created successfully",
         description: "Please check your email for verification link",
@@ -95,14 +121,16 @@ const NewUser = () => {
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong.",
-        description: error.response.data.error,
+        description: error.response?.data?.error || "An error occurred.",
       });
+      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
+
   return (
-    <>
+    <div className="sm:mt-10 mt-14 md:mt-10 lg:mt-0">
       <div>
         <Button variant="ghost" className="border">
           <Link
@@ -110,12 +138,12 @@ const NewUser = () => {
             href={"/dashboard/user"}
           >
             <ArrowLeftFromLine />
-            Dashboard
+            Back
           </Link>
         </Button>
       </div>
       <div className="flex items-center justify-center">
-        <div className="max-w-xl w-full m-4">
+        <div className="max-w-[35rem] w-full m-4">
           <div className="border-2 rounded-lg p-4">
             <div className="border-b">
               <h1 className="text-2xl pb-2 text-center font-semibold">
@@ -123,33 +151,31 @@ const NewUser = () => {
               </h1>
             </div>
             <div className="flex items-center justify-center">
-              <div className="mt-8">
-                <Input type="file" multiple onChange={handleFileChange} />
-                {loading && <p>Uploading...</p>}
-                {previewImages.length > 0 && (
-                  <div className="flex space-x-4">
-                    {previewImages.map((img, index) => (
-                      <img
-                        key={index}
-                        src={img}
-                        alt={`Preview ${index}`}
-                        className="w-32 h-32 object-cover rounded-full"
-                      />
-                    ))}
-                  </div>
-                )}
-                {imageUrls.length > 0 && (
-                  <div className="flex space-x-4">
-                    {imageUrls.map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Uploaded ${index}`}
-                        className="w-32 h-32 object-cover rounded-full"
-                      />
-                    ))}
-                  </div>
-                )}
+              <div className="flex items-center justify-center mt-8">
+                <div
+                  className="relative w-32 h-32 rounded-full border-2 border-gray-300 flex items-center justify-center cursor-pointer"
+                  onClick={handleImageClick}
+                >
+                  {previewImage ? (
+                    <img
+                      src={previewImage}
+                      alt="Profile Preview"
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-2xl">
+                      <Plus />
+                    </span>
+                  )}
+                </div>
+                <Input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  multiple={false}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
             </div>
 
@@ -166,7 +192,9 @@ const NewUser = () => {
                     placeholder="Enter name"
                   />
                   {errors.name && (
-                    <p className="text-red-500">{errors.name.message}</p>
+                    <p className="text-red-500 text-xs">
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
 
@@ -178,12 +206,47 @@ const NewUser = () => {
                     placeholder="Enter email"
                   />
                   {errors.email && (
-                    <p className="text-red-500">{errors.email.message}</p>
+                    <p className="text-red-500 text-xs">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className="flex w-full gap-x-2">
+                <div className="w-full">
+                  <Label htmlFor="bankDetails">Bank Details</Label>
+                  <Input
+                    {...register("bankDetails")}
+                    className="w-full"
+                    placeholder="Enter bank details"
+                  />
+                  {errors.bankDetails && (
+                    <p className="text-red-500 text-xs">
+                      {errors.bankDetails.message}
+                    </p>
+                  )}
+                </div>
+                <div className="w-full">
+                  <Label htmlFor="gender">Role</Label>
+                  <Select {...register("role")}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Owner">Owner</SelectItem>
+                      <SelectItem value="Traveller">Traveller</SelectItem>
+                      <SelectItem value="Admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.role && (
+                    <p className="text-red-500 text-xs">
+                      {errors.role.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div>
                 <div className="w-full">
                   <Label htmlFor="phone">Phone</Label>
                   <Input
@@ -192,7 +255,54 @@ const NewUser = () => {
                     placeholder="Enter phone number"
                   />
                   {errors.phone && (
-                    <p className="text-red-500">{errors.phone.message}</p>
+                    <p className="text-red-500 text-xs">
+                      {errors.phone.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="flex w-full gap-x-2">
+                <div className="w-full">
+                  <Label htmlFor="nationality">Nationality</Label>
+                  <Input
+                    {...register("nationality")}
+                    className="w-full"
+                    placeholder="Enter nationality"
+                  />
+                  {errors.nationality && (
+                    <p className="text-red-500 text-xs">
+                      {errors.nationality.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="w-full">
+                  <Label htmlFor="spokenLanguage">Language</Label>
+                  <Input
+                    {...register("spokenLanguage")}
+                    className="w-full"
+                    placeholder="Enter language"
+                  />
+                  {errors.spokenLanguage && (
+                    <p className="text-red-500 text-xs">
+                      {errors.spokenLanguage.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-x-2 justify-between">
+                <div className="w-full">
+                  <Label htmlFor="address">Address</Label>
+                  <Input
+                    {...register("address")}
+                    className="w-full"
+                    placeholder="Enter address"
+                  />
+                  {errors.address && (
+                    <p className="text-red-500 text-xs">
+                      {errors.address.message}
+                    </p>
                   )}
                 </div>
 
@@ -209,111 +319,35 @@ const NewUser = () => {
                     </SelectContent>
                   </Select>
                   {errors.gender && (
-                    <p className="text-red-500">{errors.gender.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex w-full gap-x-2">
-                <div className="w-full">
-                  <Label htmlFor="nationality">Nationality</Label>
-                  <Input
-                    {...register("nationality")}
-                    className="w-full"
-                    placeholder="Enter nationality"
-                  />
-                  {errors.nationality && (
-                    <p className="text-red-500">{errors.nationality.message}</p>
-                  )}
-                </div>
-
-                <div className="w-full">
-                  <Label htmlFor="spokenLanguage">Language</Label>
-                  <Input
-                    {...register("spokenLanguage")}
-                    className="w-full"
-                    placeholder="Enter language"
-                  />
-                  {errors.spokenLanguage && (
-                    <p className="text-red-500">
-                      {errors.spokenLanguage.message}
+                    <p className="text-red-500 text-xs">
+                      {errors.gender.message}
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-x-2 justify-between">
-                <div className="w-full">
-                  <Label htmlFor="address">Address</Label>
-                  <Input
-                    {...register("address")}
-                    className="w-full"
-                    placeholder="Enter address"
+              <div className="flex items-center gap-x-2">
+                <Label
+                  htmlFor="sendDetails"
+                  className="flex items-center gap-x-2"
+                >
+                  <input
+                    type="checkbox"
+                    {...register("sendDetails")}
+                    className="h-4 w-4"
                   />
-                  {errors.address && (
-                    <p className="text-red-500">{errors.address.message}</p>
-                  )}
-                </div>
+                  <span>Send registration details to email</span>
+                </Label>
               </div>
 
-              <div className="flex w-full gap-x-2">
-                <div className="w-full">
-                  <Label htmlFor="bankDetails">Bank Details</Label>
-                  <Input
-                    {...register("bankDetails")}
-                    className="w-full"
-                    placeholder="Enter bank details"
-                  />
-                  {errors.bankDetails && (
-                    <p className="text-red-500">{errors.bankDetails.message}</p>
-                  )}
-                </div>
-
-                <div className="w-full">
-                  <Label htmlFor="role">Role</Label>
-                  <Select {...register("role")}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Owner">Owner</SelectItem>
-                      <SelectItem value="Traveller">Traveller</SelectItem>
-                      <SelectItem value="Admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.role && (
-                    <p className="text-red-500">{errors.role.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="items-top   flex space-x-2">
-                <input
-                  type="checkbox"
-                  {...register("sendDetails")}
-                  id="sendDetails"
-                  className="text-xl mb-5"
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <Label
-                    htmlFor="sendDetails"
-                    className="text-sm font-medium leading-none"
-                  >
-                    Send my registration details to email
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    Please check your spam folder to get your details
-                  </p>
-                </div>
-              </div>
-              <Button type="submit" className="w-full mt-4" disabled={loading}>
-                {loadingg ? <Loader /> : "Continue"}
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? <Loader /> : "Countinue"}
               </Button>
             </form>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

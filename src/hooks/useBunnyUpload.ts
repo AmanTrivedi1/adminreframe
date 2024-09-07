@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 
 interface UploadResult {
-  imageUrls: string[]; // Changed to an array
+  imageUrls: string[];
   error: string | null;
 }
 
@@ -10,14 +10,17 @@ export const useBunnyUpload = () => {
   const [loading, setLoading] = useState(false);
 
   const uploadFiles = async (
-    files: File[],
+    files: File | File[], // Accept a single file or an array of files
     name?: string
   ): Promise<UploadResult> => {
-    if (files.length === 0) {
+    // Normalize input to always be an array
+    const fileArray = Array.isArray(files) ? files : [files];
+
+    if (fileArray.length === 0) {
       return { imageUrls: [], error: "No files provided." };
     }
 
-    for (const file of files) {
+    for (const file of fileArray) {
       if (
         !(
           file.type === "image/jpeg" ||
@@ -43,7 +46,7 @@ export const useBunnyUpload = () => {
 
     try {
       await Promise.all(
-        files.map(async (file) => {
+        fileArray.map(async (file) => {
           const randomNumberToAddInImageName = generateRandomString(7);
           const fileName = `${randomNumberToAddInImageName}${file.name}`;
 

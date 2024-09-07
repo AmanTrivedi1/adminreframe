@@ -4,22 +4,24 @@ import { connectDb } from "@/util/db";
 
 connectDb();
 
-
 import Users from "@/models/user";
 import bcryptjs from "bcryptjs";
 import { sendEmail } from "@/util/mailer";
 import { userSchema } from "@/schemas/user.schema";
+import crypto from "crypto";
+
+const generateRandomPassword = (length: number): string => {
+  return crypto.randomBytes(length).toString("hex").slice(0, length);
+};
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const reqBody = await request.json();
-
     const parsedBody = userSchema.parse(reqBody);
 
     const {
       name,
       email,
-      password,
       role,
       sendDetails,
       phone,
@@ -39,8 +41,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
+    const plainPassword = generateRandomPassword(8);
     const salt = await bcryptjs.genSalt(10);
-    const hashedPassword = await bcryptjs.hash(password, salt);
+    const hashedPassword = await bcryptjs.hash(plainPassword, salt);
 
     const newUser = new Users({
       name,
@@ -56,13 +59,13 @@ export async function POST(request: Request): Promise<NextResponse> {
       profilePic,
     });
     const savedUser = await newUser.save();
-    console.log(sendDetails, "Value");
+
     if (sendDetails) {
       await sendEmail({
         email,
         emailType: "VERIFY",
         userId: savedUser._id.toString(),
-        password,
+        password: plainPassword,
       });
     }
     return NextResponse.json({
