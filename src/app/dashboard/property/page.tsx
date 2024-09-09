@@ -120,7 +120,7 @@ const PropertyPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       const response = await axios.post("/api/visibiltychange", {
-        id: propertyId, 
+        id: propertyId,
         isLive: false,
       });
 

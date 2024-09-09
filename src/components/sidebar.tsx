@@ -69,8 +69,8 @@ export function Sidebar() {
       {/* Sidebar for smaller screens */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <div className="lg:hidden">
-            <GiHamburgerMenu className="text-2xl z-50 ml-2 mt-1 fixed top-0 left-0 cursor-pointer text-black dark:text-white" />
+          <div className="lg:hidden ">
+            <GiHamburgerMenu className="text-2xl  z-50 ml-2 mt-1 fixed top-0 left-0 cursor-pointer text-black dark:text-white" />
           </div>
         </SheetTrigger>
 
