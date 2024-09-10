@@ -35,7 +35,10 @@ export interface Property {
   city?: string;
   state?: string;
   country?: string;
-  center?: object;
+  center?: {
+    lat: number;
+    lng: number;
+  };
 
   portionName?: string[];
   portionSize?: number[];
